@@ -1,0 +1,10 @@
+.result{
+    height: 500px;
+
+    margin: 10px;
+
+    border: 2px solid gray;
+
+    overflow-x: hidden; 
+    overflow-y: auto; 
+}
