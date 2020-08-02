@@ -1,0 +1,58 @@
+#idvideoDemo{
+    width: 100%;
+    margin: auto;
+}
+.videoView{
+    position: relative;
+}
+.videoView video{
+    position: absolute;
+    top: 0;
+	left: 0;
+	z-index: -1;
+}
+.videoView .infoText{
+    width: 80%;
+    height: 500px;
+    position: absolute;
+    top: 30px;
+	left: 10%;
+    z-index: 0;
+
+    padding: 100px;
+
+    background-color: rgba(0,0,0,0.6);
+ 
+
+    text-align: center;
+    color:whitesmoke;
+}
+.videoView .infoText h1{
+    font-size: 40px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 800;
+}
+.videoView .infoText .redirect{
+
+    display: flex;
+    justify-content: center;
+    
+}
+.videoView .infoText .redirect a{
+
+    width: 20%;
+    margin: 70px 30px 0px;
+    padding: 14px 16px;
+    display: block;
+
+    background-color: lightseagreen;
+    color: white;
+
+    text-align: center;
+
+    text-decoration: none;
+}
+
+.videoView .infoText .redirect a:hover{
+    background-color: rgb(4, 124, 118);
+}

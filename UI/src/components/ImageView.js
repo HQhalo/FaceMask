@@ -5,19 +5,31 @@ class ImageView extends Component {
     convertCoods(boxes,[cw,ch,iw,ih]){
         var x = boxes[0]/iw*cw;
         var y = boxes[1]/ih*ch;
-        var w = boxes[2]/iw*cw;
-        var h = boxes[3]/ih*ch;
+        var w = (boxes[2]-boxes[0])/iw*cw;
+        var h = (boxes[3]-boxes[1])/ih*ch;
         return [x,y,w,h];
+    }
+    RGBToHex = ([r,g,b]) =>{
+        r = r.toString(16);
+        g = g.toString(16);
+        b = b.toString(16);
+      
+        if (r.length === 1)
+          r = "0" + r;
+        if (g.length === 1)
+          g = "0" + g;
+        if (b.length === 1)
+          b = "0" + b;
+      
+        return "#" + r + g + b;
     }
     drawBoxs(ctx,[cw,ch,iw,ih]){
         
         if(this.props.dataResult){
             this.props.dataResult.map((box)=>{
                 ctx.beginPath();
-                ctx.lineWidth = "1.5";
-                var color = "#"+(box.color[0]).toString(16)
-                            +(box.color[1]).toString(16)
-                            +(box.color[2]).toString(16);
+                ctx.lineWidth = "2";
+                var color = this.RGBToHex(box.color);
 
                 ctx.strokeStyle = color;
                 var [x,y,w,h] =this.convertCoods(box.boxes,[cw,ch,iw,ih]);
@@ -41,15 +53,14 @@ class ImageView extends Component {
         const img = this.refs.image
 
         img.onload = () => {
+            console.log("load image");
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);           
             this.drawBoxs(ctx,[canvas.width, canvas.height,img.width,img.height]);    
         }
     }
-    componentDidUpdate(){
-        this.draw();
-    }
-    
+
     componentDidMount(){
+        
         this.draw();
     }
     

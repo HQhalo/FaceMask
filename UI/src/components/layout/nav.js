@@ -5,8 +5,8 @@ const Nav = () => {
         <nav className='navBar'>
             <ul>
                 <li><a href="/">Home</a></li>
-                <li><a href="object">Object Detection</a></li>
-                <li><a href="/myobject">My Object</a></li>
+                <li><a href="object">YOLOv3</a></li>
+                <li><a href="/myobject">Face Mask</a></li>
             </ul>
         </nav>
     );

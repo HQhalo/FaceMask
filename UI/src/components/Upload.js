@@ -5,6 +5,7 @@ class Upload extends Component {
         selectFile : null,
     }
     onFileChange = (e) =>{
+        
         var file = e.target.files[0];
         if(file && file['type'].split('/')[0] === 'image'){
             this.setState({
@@ -17,7 +18,9 @@ class Upload extends Component {
         }
         
     }
+   
     onUploadFile = ()=>{
+        console.log(this)
         if(this.state.selectFile){
             this.props.uploadFile(this.state.selectFile);
         }

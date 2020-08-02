@@ -22,7 +22,7 @@ class Object extends Component {
         file.name 
         ); 
         
-        axios.post("http://localhost:5000/api/test", formData).then((response) => {
+        axios.post(process.env.REACT_APP_URL_API+"/api/yolo", formData).then((response) => {
             // console.log(response.data[0].label);
             console.log(response.data);
             this.setState({

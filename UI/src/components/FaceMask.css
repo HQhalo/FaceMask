@@ -1,0 +1,22 @@
+.videoStream {
+	margin: 10px auto;
+	height: 550px;
+	position: relative;
+}
+.videoStream video{
+	position: absolute;
+    top: 0;
+	left: 0;
+	z-index: -1;
+}
+.videoStream canvas{
+	position: absolute;
+    top: 0;
+	left: 0;
+	z-index: 1;
+}
+.btn{
+    background-color: #0078d4;
+    color: white;
+    cursor: pointer;
+}
