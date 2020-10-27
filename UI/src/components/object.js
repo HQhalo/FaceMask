@@ -5,6 +5,13 @@ import ImageView from './ImageView'
 import Loading from './Loading'
 import axios from 'axios'
 class Object extends Component {
+    constructor(props){
+        super(props);
+        this.selectModel = React.createRef();
+        // axios.get("https://an25x8hv93h-496ff2e9c6d22116-5000-colab.googleusercontent.com").then((res)=>{
+        //     console.log(res.data);
+        // });
+    }
     state = { 
         imageView: null,
         dataResult: null,
@@ -22,7 +29,8 @@ class Object extends Component {
         file.name 
         ); 
         
-        axios.post(process.env.REACT_APP_URL_API+"/api/yolo", formData).then((response) => {
+        let url = process.env.REACT_APP_URL_API+"/api/" + this.selectModel.current.value;
+        axios.post(url, formData).then((response) => {
             // console.log(response.data[0].label);
             console.log(response.data);
             this.setState({
@@ -64,6 +72,12 @@ class Object extends Component {
                     <div className='row'>
                         <div className='col-6'>
                             <Upload uploadFile={this.uploadFile} changeImage = {this.changeImage}/>
+                        </div>
+                        <div className='col-4 '>
+                            <select ref={this.selectModel} className='form-control'>
+                                <option value='yolo'>YOLO</option>
+                                <option value='test'>FACE MASK</option>
+                            </select>
                         </div>
                     </div>
                 </div>

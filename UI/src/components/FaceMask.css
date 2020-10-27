@@ -1,6 +1,7 @@
 .videoStream {
-	margin: 10px auto;
-	height: 550px;
+	margin: 10px 20px;
+	height: 520px;
+	width: 100%;
 	position: relative;
 }
 .videoStream video{
@@ -16,7 +17,12 @@
 	z-index: 1;
 }
 .btn{
+	width: 100px;
+	margin-left: 20px;
     background-color: #0078d4;
     color: white;
     cursor: pointer;
+}
+.management > div{
+	margin: 20px;
 }

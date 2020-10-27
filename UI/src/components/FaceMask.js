@@ -5,13 +5,21 @@ import './FaceMask.css';
 class FaceMask extends Component {
     state = {
         capture: false,
+        alert: false,
+        thres: "0.3",
     }
     constructor(props) {
         super(props);
+        
         this.videoTag = React.createRef();
         this.drawCanvas = React.createRef();
         this.videoContainer = React.createRef();
-        this.updateInterval = 3050;
+        this.cameraOptions = React.createRef();
+        this.thresRange = React.createRef();
+        this.triggerSound = React.createRef();
+        this.buttonAlert = React.createRef();
+
+        this.updateInterval = 300;
         this.sizeImageUpload = 720;
         this.localStream = null;
     }
@@ -26,9 +34,10 @@ class FaceMask extends Component {
     componentDidMount(){
         this.imageCanvas = document.createElement('canvas');
         this.imageCtx = this.imageCanvas.getContext("2d");
-        
+        this.getCameraSelection();
         //create a canvas for drawing object boundaries
         this.drawCtx = this.drawCanvas.current.getContext("2d"); 
+        this.thresRange.current.value = 0.3;
         
     }
     drawBoxes = (objs)=>{
@@ -41,7 +50,7 @@ class FaceMask extends Component {
         objs.forEach(obj =>{
             let color = this.RGBToHex(obj.color);
             let [x,y,w,h] =this.convertCoods(obj.boxes,[cw,ch,iw,ih]);
-           
+            
             this.drawCtx.fillStyle = color;
             this.drawCtx.fillText(obj.label + "(" + Math.round(obj.confidence * 100) + "%)", x , y - 5);
             this.drawCtx.strokeStyle = color;
@@ -71,10 +80,15 @@ class FaceMask extends Component {
         file.name 
         ); 
         
-        axios.post(process.env.REACT_APP_URL_API+"/api/test", formData).then((response) => {
+        axios.post(process.env.REACT_APP_URL_API+"/api/test?confThres="+this.state.thres, formData).then((response) => {
             // console.log(response.data[0].label);
             console.log(response.data);
             if(this.state.capture){
+                response.data.forEach((obj) =>{
+                    if(this.state.alert && obj.label === 'face_no_mask'){
+                        this.triggerSound.current.play();
+                    }
+                } );
                 this.drawBoxes(response.data);
             }
             else{
@@ -112,12 +126,17 @@ class FaceMask extends Component {
         this.startObjectDetection();
         
     }
-    onClickCapture = ()=>{    
+    onClickCapture = ()=>{  
+        this.onClickStop();
+        console.log(this.cameraOptions.current.value);  
         const constraints = {
             audio: false,
             video: {
                 width: {min: 640, ideal: 1280, max: 1920},
-                height: {min: 480, ideal: 720, max: 1080}
+                height: {min: 480, ideal: 720, max: 1080},
+                deviceId: {
+                    exact: this.cameraOptions.current.value
+                  }
             }
         };
         navigator.mediaDevices.getUserMedia(constraints)
@@ -130,7 +149,7 @@ class FaceMask extends Component {
             });
         
         this.setState({
-            capture : !this.state.capture,
+            capture : true,
         });
     }
     onClickStop = ()=>{
@@ -139,24 +158,64 @@ class FaceMask extends Component {
             this.videoTag.current.srcObject = null;
             this.localStream.getVideoTracks()[0].stop();
             this.setState({
-                capture : !this.state.capture,
+                capture : false,
             });
         }
     }
+    onClickAlert = () =>{
+        console.log(this.buttonAlert);
+        if(this.buttonAlert.current.textContent === 'Alert'){
+            this.buttonAlert.current.textContent = "Stop";
+        }
+        else{
+            this.buttonAlert.current.textContent = "Alert";
+        }
+        this.setState({
+            alert: !this.state.alert,
+        });
+    }
+    getCameraSelection = async () => {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        const options = videoDevices.map(videoDevice => {
+          return `<option value="${videoDevice.deviceId}">${videoDevice.label}</option>`;
+        });
+        this.cameraOptions.current.innerHTML = options.join('');
+      };
+    changeRangeSlider = () =>{
+        // console.log( this.thresRange.current.value);
+        this.setState({
+            thres:this.thresRange.current.value,
+        });
+    }
     render() {
         return (
-            <div className = "container">
-                <div ref = {this.videoContainer}className="row videoStream">
-                    <canvas ref={this.drawCanvas}  width={1000} height={562}/>
-                    <video ref={this.videoTag} width={1000} height={562} onPlaying={this.onPlay}id= "videoElement" autoPlay></video>
-                </div>
-                <div className = "row ">
-                    <div className='col-6'>
-                        <span onClick={this.onClickCapture} className='btn'>Capture</span>
-                        <span onClick={this.onClickStop} className='btn'>Stop</span>
+            <div className = "container-fluid">
+                <div className='row '>
+                    <div className='col-3 management'>           
+                        <div>
+                            <span onClick={this.onClickCapture} className='btn'>Capture</span>
+                            <span onClick={this.onClickStop} className='btn'>Stop</span>
+                        </div>
+                        <div>
+                            <select ref={this.cameraOptions} name="" id="">
+                                <option value="">Select camera</option>
+                            </select>
+                        </div>
+                        
+                        <div className="form-group">
+                            <label htmlFor="formControlRange">ConfThres: </label>
+                            <span>{this.state.thres}</span>
+                            <input ref={this.thresRange} onChange={this.changeRangeSlider}  type="range" className="custom-range" min="0.001" max="1" step="0.001"  id="customRange3"/>
+                        </div>
+                        <span ref={this.buttonAlert} onClick={this.onClickAlert} className='btn'>Alert</span>
                     </div>
-                    
+                    <div ref = {this.videoContainer}className="col-8 videoStream justify-content-md-center">
+                        <canvas ref={this.drawCanvas}  width={912} height={513}/>
+                        <video ref={this.videoTag} width={912} height={513} onPlaying={this.onPlay}id= "videoElement" autoPlay></video>
+                    </div>
                 </div>
+                <audio ref = {this.triggerSound} src={"363920__samsterbirdies__8-bit-error.wav"} preload="auto"></audio>
             </div>
             
             
